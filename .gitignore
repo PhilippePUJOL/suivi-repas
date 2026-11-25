@@ -1,0 +1,9 @@
+node_modules/
+.env
+apps/mobile/config.js
+supabase/.temp/
+supabase/.branches/
+*.log
+.DS_Store
+Thumbs.db
+docs/_sauvegardes/
