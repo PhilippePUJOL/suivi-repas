@@ -147,7 +147,7 @@ Toutes les tables exposées utilisent :
   - `est_type_par_defaut boolean not null default false` (`RG-TMP-02`, `RG-TMP-04`)
   - Contrainte : `check (fenetre_debut <> fenetre_fin)`.
   - Index uniques partiels : `(user_id, mandant_id, priorite) where not est_archive` et `(user_id, mandant_id) where est_type_par_defaut`.
-  - Un déclencheur interdit d'archiver ou de supprimer le `Type par défaut` (`RG-TMP-07`).
+  - Le `Type par défaut` ne peut être ni archivé (contrainte `check (not (est_type_par_defaut and est_archive))`) ni supprimé (déclencheur `BEFORE DELETE`, sauf suppression en cascade du compte) (`RG-TMP-07`).
   - `est_archive boolean not null default false`
   - `created_at timestamptz not null default now()`, `updated_at timestamptz not null default now()`
   - Index composite recommandé : `(mandant_id, user_id, est_archive, priorite)`.
@@ -272,6 +272,8 @@ Un aliment porte **un seul jeu de valeurs nutritionnelles** (`RG-REF-01`, `RG-ET
     - les parts supérieures à 1 (`portion_numerateur > portion_denominateur`) sont autorisées
     - `type_element = 'ALIMENT'` → `mode_portion = 'GRAMMES'`
     - `mode_portion = 'GRAMMES'` sur une `RECETTE` ou un `PLAT_PREPARE` exige un `Poids total` renseigné sur l'élément référencé (`poids_total_net_g` ou `poids_total_g`) : règle inter-tables contrôlée par déclencheur SQL et par le service
+
+- **Enregistrement atomique (`F-EDIT-05`, `NFR-SUP-REL-01`)** : la prise et ses éléments sont enregistrés par la fonction RPC `public.enregistrer_prise_alimentaire(p_prise jsonb, p_elements jsonb)` (`SECURITY INVOKER`, soumise à la RLS), en une seule transaction : en modification, les lignes existantes (hors `Élément supprimé`) sont remplacées. Aucune prise n'est jamais enregistrée partiellement.
 
 ### 3.6. Suppression logique vs physique et restauration (`RG-SUP-01` à `04`)
 
