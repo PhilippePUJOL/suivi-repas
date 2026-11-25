@@ -1,0 +1,4 @@
+-- Jeu de données de l'instance locale / CI uniquement (jamais appliqué au projet réel).
+-- Les mandants REAL et TEST sont créés par la migration 20261126000100.
+-- Les aliments appartiennent à un utilisateur : ils sont chargés par scripts/referentiel-vers-sql.js
+-- ou par l'écran d'import, jamais ici.

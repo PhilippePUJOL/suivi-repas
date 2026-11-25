@@ -236,7 +236,7 @@ Un aliment porte **un seul jeu de valeurs nutritionnelles** (`RG-REF-01`, `RG-ET
   - `id uuid primary key default gen_random_uuid()`
   - `user_id uuid not null references auth.users(id) on delete cascade`
   - `mandant_id uuid not null references mandants(id) on delete restrict`
-  - `type_prise_alimentaire_id uuid not null references types_prise_alimentaire(id) on delete restrict` (`RG-TMP-06` ; un type référencé ne peut qu'être archivé selon `RG-TMP-07`)
+  - `type_prise_alimentaire_id uuid not null references types_prise_alimentaire(id) on delete no action` (`RG-TMP-06` ; un type référencé ne peut qu'être archivé selon `RG-TMP-07` ; `no action` refuse la suppression comme `restrict`, mais en fin d'instruction, ce qui permet la suppression en cascade d'un compte)
   - `horodatage_prise timestamptz not null`
   - `date_locale date not null` (`RG-TMP-01` : date calendaire civile locale, de 00:00 à 23:59, dans le fuseau de saisie)
   - `created_at timestamptz not null default now()`, `updated_at timestamptz not null default now()`

@@ -5,11 +5,13 @@
   "description": "Suivi nutritionnel personnel (PWA mobile, Supabase)",
   "type": "module",
   "scripts": {
-    "test": "node --test tests/unit/",
+    "test": "node --test \"tests/unit/*.test.js\" \"tests/sql/*.test.js\"",
+    "test:unit": "node --test \"tests/unit/*.test.js\"",
     "supabase": "supabase",
     "serveur": "python -m http.server 8000"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "0.5.16",
     "supabase": "3.1.0"
   }
 }
