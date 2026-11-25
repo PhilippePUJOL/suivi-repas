@@ -1,0 +1,42 @@
+/* Jetons de conception — thème clair uniquement (docs/04 §2.1). */
+:root {
+  --police: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --taille-xs: 0.75rem;
+  --taille-s: 0.875rem;
+  --taille-m: 1rem;
+  --taille-l: 1.25rem;
+  --taille-xl: 1.75rem;
+
+  --couleur-fond: #f6f7f9;
+  --couleur-surface: #ffffff;
+  --couleur-texte: #1c2430;
+  --couleur-texte-secondaire: #5b6675;
+  --couleur-bordure: #dde2e8;
+  --couleur-principale: #2f5d8a;        /* bleu ardoise */
+  --couleur-principale-texte: #ffffff;
+  --couleur-principale-douce: #e6eef6;
+  --couleur-ambre: #b26a00;              /* hors cible / avertissement (jamais rouge ni vert) */
+  --couleur-ambre-douce: #fff4e0;
+  --couleur-danger: #b3261e;             /* actions destructrices uniquement */
+  --couleur-danger-douce: #fdecea;
+  --couleur-test: #e8730c;               /* bandeau du mandant TEST */
+
+  --espace-1: 4px;
+  --espace-2: 8px;
+  --espace-3: 12px;
+  --espace-4: 16px;
+  --espace-5: 24px;
+  --espace-6: 32px;
+
+  --rayon-s: 6px;
+  --rayon-m: 12px;
+  --rayon-l: 20px;
+  --ombre: 0 1px 3px rgba(20, 30, 45, 0.12), 0 4px 12px rgba(20, 30, 45, 0.06);
+  --cible-tactile: 44px;
+  --hauteur-nav: 64px;
+  --duree: 180ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --duree: 0ms; }
+}

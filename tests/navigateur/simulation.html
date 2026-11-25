@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Suivi nutritionnel — simulation</title>
+  <link rel="stylesheet" href="../../design-system/tokens.css">
+  <link rel="stylesheet" href="../../design-system/base.css">
+  <link rel="stylesheet" href="../../design-system/components/composants.css">
+  <link rel="stylesheet" href="../../apps/mobile/app.css">
+  <!-- Essai de l'interface avec un client Supabase simulé en mémoire (aucune donnée réelle). -->
+  <script type="module">
+    import { clientSimule } from './client-simule.js';
+    globalThis.__CLIENT_SIMULE__ = clientSimule;
+    sessionStorage.setItem('suivi-repas.mandant', JSON.stringify({ code: 'TEST' }));
+    if (!location.hash || location.hash === '#/connexion') location.hash = '#/accueil';
+    await import('../../apps/mobile/app.js');
+  </script>
+</head>
+<body>
+  <div id="application"></div>
+</body>
+</html>

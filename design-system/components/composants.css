@@ -1,0 +1,82 @@
+/* Briques d'interface transverses (docs/03 §4). Cibles tactiles ≥ 44 × 44 px. */
+
+/* ---------- Boutons */
+.bouton {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--espace-2);
+  min-height: var(--cible-tactile); min-width: var(--cible-tactile);
+  padding: 0 var(--espace-4);
+  border: 1px solid var(--couleur-bordure); border-radius: var(--rayon-m);
+  background: var(--couleur-surface); cursor: pointer;
+  transition: background var(--duree);
+}
+.bouton:disabled { opacity: 0.5; cursor: not-allowed; }
+.bouton--principal { background: var(--couleur-principale); color: var(--couleur-principale-texte); border-color: var(--couleur-principale); font-weight: 600; }
+.bouton--danger { color: var(--couleur-danger); border-color: var(--couleur-danger); }
+.bouton--discret { border-color: transparent; background: transparent; }
+.bouton--large { width: 100%; }
+.bouton--icone { padding: 0; width: var(--cible-tactile); }
+.bouton[aria-busy="true"] { opacity: 0.7; cursor: progress; }
+
+/* ---------- Champs */
+.champ { display: flex; flex-direction: column; gap: var(--espace-1); }
+.champ > span { font-size: var(--taille-s); color: var(--couleur-texte-secondaire); }
+.saisie {
+  min-height: var(--cible-tactile); padding: 0 var(--espace-3);
+  border: 1px solid var(--couleur-bordure); border-radius: var(--rayon-s);
+  background: var(--couleur-surface); width: 100%;
+}
+textarea.saisie { padding: var(--espace-2) var(--espace-3); min-height: 64px; }
+
+/* ---------- Puces et contrôle segmenté */
+.puces { display: flex; flex-wrap: wrap; gap: var(--espace-2); }
+.puce {
+  min-height: 36px; padding: 0 var(--espace-3);
+  border: 1px solid var(--couleur-bordure); border-radius: 999px;
+  background: var(--couleur-surface); cursor: pointer;
+}
+.puce[aria-pressed="true"] { background: var(--couleur-principale); color: var(--couleur-principale-texte); border-color: var(--couleur-principale); }
+.segmente { display: inline-flex; border: 1px solid var(--couleur-bordure); border-radius: var(--rayon-s); overflow: hidden; }
+.segmente button { min-height: 36px; min-width: 56px; border: 0; background: var(--couleur-surface); cursor: pointer; }
+.segmente button + button { border-left: 1px solid var(--couleur-bordure); }
+.segmente button[aria-pressed="true"] { background: var(--couleur-principale); color: var(--couleur-principale-texte); }
+
+/* ---------- Cartes */
+.carte { background: var(--couleur-surface); border-radius: var(--rayon-m); box-shadow: var(--ombre); padding: var(--espace-4); }
+.pile { display: flex; flex-direction: column; gap: var(--espace-3); }
+.ligne { display: flex; align-items: center; gap: var(--espace-2); }
+.ligne--espacee { justify-content: space-between; }
+.grandit { flex: 1; min-width: 0; }
+
+/* ---------- Badges (docs/03 §4.2) */
+.badge { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: var(--taille-xs); background: var(--couleur-principale-douce); color: var(--couleur-principale); white-space: nowrap; }
+.badge--ambre { background: var(--couleur-ambre-douce); color: var(--couleur-ambre); }
+
+/* ---------- Indicateur d'incomplétude (docs/03 §4.1) */
+.incompletude { color: var(--couleur-ambre); font-weight: 700; cursor: help; }
+
+/* ---------- Messages (docs/03 §4.7) */
+.bandeau-erreur {
+  display: flex; align-items: center; gap: var(--espace-3);
+  padding: var(--espace-3) var(--espace-4); border-radius: var(--rayon-m);
+  background: var(--couleur-danger-douce); color: var(--couleur-danger);
+}
+.avertissement { color: var(--couleur-ambre); font-size: var(--taille-s); }
+.notification {
+  position: fixed; left: 50%; bottom: calc(var(--hauteur-nav) + var(--espace-4)); transform: translateX(-50%);
+  background: var(--couleur-texte); color: #fff; padding: var(--espace-3) var(--espace-4);
+  border-radius: var(--rayon-m); box-shadow: var(--ombre); z-index: 50; max-width: calc(100% - 32px);
+}
+
+/* ---------- Feuilles (panneaux glissant depuis le bas) */
+.voile { position: fixed; inset: 0; background: rgba(20, 30, 45, 0.4); z-index: 40; display: flex; align-items: flex-end; }
+.feuille {
+  background: var(--couleur-surface); width: 100%; max-height: 92vh; overflow: auto;
+  border-radius: var(--rayon-l) var(--rayon-l) 0 0; padding: var(--espace-4);
+  display: flex; flex-direction: column; gap: var(--espace-4);
+}
+.feuille--pleine { height: 100vh; max-height: 100vh; border-radius: 0; }
+
+/* ---------- Bloc de valeurs (docs/03 §4.3) */
+.valeurs { display: grid; grid-template-columns: 1fr auto; gap: 2px var(--espace-3); font-size: var(--taille-s); }
+.valeurs .retrait { padding-left: var(--espace-4); color: var(--couleur-texte-secondaire); }
+.valeurs .nombre { text-align: right; font-variant-numeric: tabular-nums; }

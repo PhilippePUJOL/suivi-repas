@@ -7,3 +7,4 @@ supabase/.branches/
 .DS_Store
 Thumbs.db
 docs/_sauvegardes/
+referentiel-*.sql

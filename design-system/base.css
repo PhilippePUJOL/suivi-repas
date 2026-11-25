@@ -1,0 +1,39 @@
+/* Styles de base communs. */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+[hidden] { display: none !important; }
+
+body {
+  margin: 0;
+  font-family: var(--police);
+  font-size: var(--taille-m);
+  line-height: 1.4;
+  color: var(--couleur-texte);
+  background: var(--couleur-fond);
+}
+
+h1, h2, h3 { margin: 0; line-height: 1.2; }
+h1 { font-size: var(--taille-l); }
+h2 { font-size: var(--taille-m); }
+p { margin: 0; }
+
+button, input, select, textarea { font: inherit; color: inherit; }
+
+:focus-visible {
+  outline: 3px solid var(--couleur-principale);
+  outline-offset: 2px;
+}
+
+.visuellement-cache {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+}
+
+.texte-secondaire { color: var(--couleur-texte-secondaire); font-size: var(--taille-s); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}

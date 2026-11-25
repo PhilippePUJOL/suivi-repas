@@ -204,6 +204,27 @@ test('cibles : contraintes et rétablissement des cibles de départ (CA-16)', as
   });
 });
 
+test('enregistrer_prise_alimentaire : création, modification, tout ou rien', async () => {
+  await enTantQue(db, ALICE, async () => {
+    const riz = (await db.query(`insert into public.aliments (mandant_id, nom, est_cuisinable) values ($1, 'Riz RPC', true) returning id`, [TEST])).rows[0].id;
+    const type = (await db.query(`select id from public.types_prise_alimentaire where mandant_id = $1 and priorite = 2`, [TEST])).rows[0].id;
+    const prise = { mandant_id: TEST, type_prise_alimentaire_id: type, horodatage_prise: '2026-11-25T19:30:00Z', date_locale: '2026-11-25' };
+    const ligne = { type_element: 'ALIMENT', aliment_id: riz, etat_aliment: 'CUIT', mode_portion: 'GRAMMES', portion_grammes: 150, note_libre: ' vapeur ' };
+    const id = (await db.query('select public.enregistrer_prise_alimentaire($1, $2) as id', [prise, JSON.stringify([ligne])])).rows[0].id;
+    let l = await db.query('select note_libre, portion_grammes::float from public.elements_prise_alimentaire where prise_alimentaire_id = $1', [id]);
+    assert.deepEqual(l.rows, [{ note_libre: 'vapeur', portion_grammes: 150 }]);
+    await db.query('select public.enregistrer_prise_alimentaire($1, $2)', [{ ...prise, id }, JSON.stringify([{ ...ligne, portion_grammes: 200 }, { ...ligne, etat_aliment: 'CRU', portion_grammes: 50 }])]);
+    l = await db.query('select count(*)::int n from public.elements_prise_alimentaire where prise_alimentaire_id = $1', [id]);
+    assert.equal(l.rows[0].n, 2);
+    // Une ligne invalide (état manquant) annule tout : la prise reste inchangée.
+    await rejette(db.query('select public.enregistrer_prise_alimentaire($1, $2)', [{ ...prise, id }, JSON.stringify([{ ...ligne, etat_aliment: null }])]), /Cru ou Cuit/);
+    l = await db.query('select count(*)::int n from public.elements_prise_alimentaire where prise_alimentaire_id = $1', [id]);
+    assert.equal(l.rows[0].n, 2);
+    await rejette(db.query('select public.enregistrer_prise_alimentaire($1, $2)', [prise, '[]']), /au moins un élément/);
+    await rejette(db.query('select public.enregistrer_prise_alimentaire($1, $2)', [{ ...prise, mandant_id: REAL }, JSON.stringify([ligne])]), /Accès refusé|foreign key/);
+  });
+});
+
 test('suppression d\'un compte : toutes ses données partent en cascade', async () => {
   await db.query('delete from auth.users where id = $1', [ALICE]);
   const r = await db.query('select count(*)::int n from public.types_prise_alimentaire where user_id = $1', [ALICE]);
