@@ -396,6 +396,7 @@ Moutarde;non;;151;3,5;2,4;11,3;0,6;7,1;;6;;;non;non;
 
 - `ALTER TABLE ... ENABLE ROW LEVEL SECURITY;` est activé sur toutes les tables exposées : `mandants`, `habilitations`, `utilisateurs_autorises` (sans aucune politique), `types_prise_alimentaire`, `aliments`, `recettes`, `compositions_recette`, `plats_prepares`, `prises_alimentaires`, `elements_prise_alimentaire`, `cibles_nutritionnelles`, `poids_reference`.
 - L'accès est refusé par défaut au rôle `anon`.
+- **Privilèges explicites** : les projets Supabase récents n'accordent aucun droit par défaut sur les nouvelles tables. Une migration accorde au seul rôle `authenticated` la lecture de `mandants` et `habilitations`, et la lecture / écriture des tables métier ; `anon` ne reçoit aucun droit, et `utilisateurs_autorises` reste inaccessible à tous les rôles de l'API.
 - Fonction helper SQL `public.est_habilite_mandant(p_mandant_id uuid) returns boolean` (`SECURITY DEFINER`, `SET search_path = public`, droits d'exécution limités aux rôles requis) vérifiant :
 
 ```sql
