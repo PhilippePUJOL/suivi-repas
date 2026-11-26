@@ -32,7 +32,7 @@ select is((select count(*)::int from public.habilitations where user_id = '33333
 
 -- anon.
 set local role anon;
-select is((select count(*)::int from public.mandants), 0, 'anon ne voit aucun mandant');
+select throws_ok($$ select * from public.mandants $$, '42501', null, 'anon : mandants inaccessibles');
 select throws_ok($$ select * from public.utilisateurs_autorises $$, '42501', null, 'anon : utilisateurs_autorises inaccessible');
 reset role;
 

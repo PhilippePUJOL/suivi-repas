@@ -60,10 +60,8 @@ test('utilisateurs_autorises inaccessible depuis l\'API', async () => {
 
 test('anon ne voit rien', async () => {
   await enTantQue(db, null, async () => {
-    const m = await db.query('select * from public.mandants');
-    assert.equal(m.rows.length, 0);
-    const a = await db.query('select * from public.aliments');
-    assert.equal(a.rows.length, 0);
+    await rejette(db.query('select * from public.mandants'), /permission denied/);
+    await rejette(db.query('select * from public.aliments'), /permission denied/);
   });
 });
 

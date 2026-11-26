@@ -20,9 +20,9 @@ const SOCLE_SUPABASE = `
   $$;
   grant execute on function auth.uid() to anon, authenticated;
   grant usage on schema public to anon, authenticated;
-  alter default privileges in schema public grant all on tables to anon, authenticated;
-  alter default privileges in schema public grant all on functions to anon, authenticated;
 `;
+// Comme les projets Supabase récents, aucun privilège par défaut n'est accordé sur les
+// nouvelles tables : les droits nécessaires sont donnés explicitement par les migrations.
 
 export async function creerBase() {
   const db = new PGlite();
