@@ -22,4 +22,4 @@ Application PWA mobile de suivi nutritionnel personnel (MVP), JavaScript vanilla
 - **Rien sur le disque C** (caches, temporaires, téléchargements). npm récent : `D:\Utilisateurs\Ophélie\Documents\VS Code\_outils-dev\npm.cmd` (cache et temporaires sur D). Ne pas utiliser le npm de `C:\Program Files\nodejs` (obsolète).
 - Tests unitaires : `node --test tests/unit/`
 - Serveur local : `python -m http.server 8000` depuis la racine, puis `http://localhost:8000/apps/mobile/`.
-- Ne jamais versionner de secret (`service_role`, secret OAuth). La configuration locale (`apps/mobile/config.js`) n'est pas versionnée.
+- Ne jamais versionner de secret (`service_role`, secret OAuth). `apps/mobile/config.js` est versionné : il ne contient que l'URL et la clé publique (publishable) de Supabase, nécessaires au site publié sur GitHub Pages.
