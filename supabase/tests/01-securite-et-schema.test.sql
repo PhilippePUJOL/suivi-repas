@@ -23,6 +23,9 @@ insert into auth.users (id, email) values
   ('22222222-2222-2222-2222-222222222222', 'bob@exemple.fr'),
   ('33333333-3333-3333-3333-333333333333', 'intrus@exemple.fr');
 
+-- Identifiant de REAL mémorisé avant de changer de rôle (la RLS le masque ensuite à Alice).
+select set_config('test.mandant_real', (select id::text from public.mandants where code = 'REAL'), true);
+
 -- Première connexion.
 select is((select count(*)::int from public.habilitations where user_id = '11111111-1111-1111-1111-111111111111'), 1, 'habilitation créée (e-mail comparé en minuscules)');
 select is((select count(*)::int from public.types_prise_alimentaire where user_id = '11111111-1111-1111-1111-111111111111'), 7, '7 types initiaux');
@@ -42,7 +45,7 @@ select set_config('request.jwt.claims', '{"sub":"11111111-1111-1111-1111-1111111
 select is((select count(*)::int from public.mandants), 1, 'Alice ne voit que TEST');
 select throws_ok($$ select * from public.utilisateurs_autorises $$, '42501', null, 'utilisateurs_autorises inaccessible');
 select throws_ok(
-  $$ insert into public.aliments (mandant_id, nom) select id, 'Pomme' from public.mandants where code = 'REAL' $$,
+  $$ insert into public.aliments (mandant_id, nom) values (current_setting('test.mandant_real')::uuid, 'Pomme') $$,
   '42501', null, 'écriture refusée dans un mandant non habilité (REAL)');
 select lives_ok(
   $$ insert into public.aliments (mandant_id, nom, est_cuisinable) select id, 'Riz', true from public.mandants where code = 'TEST' $$,
