@@ -79,3 +79,11 @@ node scripts/referentiel-vers-sql.js "<chemin du fichier>" votre.adresse@gmail.c
 ```
 
 Ouvrez ensuite `referentiel-TEST.sql`, copiez son contenu dans le *SQL Editor* de Supabase et exécutez-le. Recommencez avec `REAL` quand vous êtes prêt. Les aliments déjà présents sont ignorés.
+
+## 7. Application en ligne (GitHub Pages)
+
+L'application est publiée automatiquement à chaque envoi de code sur `main` : **https://philippepujol.github.io/suivi-repas/**
+
+Réglages déjà faits (27/11/2026) : *Settings* → *Pages* → *Source* : GitHub Actions ; origine `https://philippepujol.github.io` dans Google Cloud ; *Site URL* et *Redirect URLs* `https://philippepujol.github.io/suivi-repas/apps/mobile/` dans Supabase (en gardant `http://localhost:8000/apps/mobile/` dans *Redirect URLs*).
+
+Sur le téléphone : Android (Chrome) menu ⋮ → *Ajouter à l'écran d'accueil* ; iPhone (Safari) *Partager* → *Sur l'écran d'accueil*.
