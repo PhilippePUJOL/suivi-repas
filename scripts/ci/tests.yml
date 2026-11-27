@@ -27,4 +27,14 @@ jobs:
         with:
           version: 3.1.0
       - run: supabase db start
-      - run: supabase test db
+      - name: Tests pgTAP
+        shell: bash
+        run: |
+          set +e
+          supabase test db 2>&1 | tee resultat-pgtap.txt
+          statut=${PIPESTATUS[0]}
+          # Les échecs sont repris en annotations, lisibles sans ouvrir les journaux.
+          grep -E "not ok|Failed|ERROR|# +(got|expected|Looks like)" resultat-pgtap.txt | head -40 | while IFS= read -r ligne; do
+            echo "::error title=pgTAP::${ligne}"
+          done
+          exit $statut
