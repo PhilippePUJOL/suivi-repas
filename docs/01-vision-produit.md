@@ -35,7 +35,7 @@
   * Index glycémique (renseigné au niveau des aliments).
   * Affichage des valeurs brutes et des **agrégats nutritionnels** (par prise alimentaire, journée, semaine calendaire, période glissante de 7 jours), chaque grandeur pouvant être située visuellement par rapport à une **cible nutritionnelle** définie par l'utilisateur : fixe, rapportée à son poids de référence ou à la référence énergétique, avec des cibles de départ modifiables.
 * **Accélérateurs de saisie** : Suggestions rapides d'éléments de prise alimentaire et de portions basées sur le type de prise alimentaire et l'historique, duplication de prises alimentaires récentes et accès rapide aux bases courantes.
-* **Isolation stricte des données par `Mandant`** : Toutes les données sont rattachées à un utilisateur autorisé et à un `Mandant` unique (`REAL` pour l'usage réel, `TEST` pour les essais), choisi explicitement avant la connexion et visible en permanence, sans aucun mélange entre mandants ni partage entre utilisateurs.
+* **Isolation stricte des données par `Mandant`** : Toutes les données sont rattachées à un utilisateur autorisé et à un `Mandant` unique (`REAL` pour l'usage réel, `TEST` pour les essais), choisi explicitement à la première connexion, mémorisé ensuite sur l'appareil, modifiable une fois connecté et visible en permanence, sans aucun mélange entre mandants ni partage entre utilisateurs.
 
 
 ### 3.2. Orientations Futures & Backlog (V2+ — Hors MVP)

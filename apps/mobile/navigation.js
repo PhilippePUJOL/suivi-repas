@@ -23,12 +23,26 @@ export function naviguer(chemin) {
   else location.hash = cible;
 }
 
-/** Termine la session et revient au choix du mandant (RG-MND-04). */
+/** Déconnexion volontaire (ou compte non autorisé) : efface la session et le Mandant mémorisé. */
 export async function quitterSession(message = null) {
   await deconnexion();
-  oublierMandant();
+  oublierMandant({ appareil: true });
   contexte.session = null;
   contexte.mandant = null;
   contexte.messageConnexion = message;
   naviguer('connexion');
+}
+
+/** Retour au choix explicite du Mandant en gardant la session Google (RG-MND-02). */
+export function choisirUnMandant(message = null) {
+  oublierMandant();
+  contexte.mandant = null;
+  contexte.messageConnexion = message;
+  naviguer('connexion');
+}
+
+/** Recharge entièrement l'application (changement de Mandant, RG-MND-04). */
+export function recharger(chemin = 'accueil') {
+  location.hash = `#/${chemin}`;
+  location.reload();
 }

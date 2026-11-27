@@ -414,7 +414,7 @@ exists (
 - **Sur `habilitations`** : politique `SELECT` limitée à `user_id = auth.uid()` ; aucune politique `INSERT` / `UPDATE` / `DELETE` ouverte aux utilisateurs standard (les habilitations sont gérées par migration / seed ou par des privilèges d'administration contrôlés).
 - **Sur `mandants`** : politique `SELECT` limitée aux mandants actifs pour lesquels l'utilisateur dispose d'une habilitation active (`exists (... habilitations ...)`).
 - **Sur chaque table métier** (`types_prise_alimentaire`, `aliments`, `recettes`, `compositions_recette`, `plats_prepares`, `prises_alimentaires`, `elements_prise_alimentaire`, `cibles_nutritionnelles`, `poids_reference`) : les politiques `SELECT`, `INSERT`, `UPDATE`, `DELETE` exigent systématiquement `user_id = auth.uid()` **ET** `public.est_habilite_mandant(mandant_id)`.
-- **`Mandant` actif** : la RLS garantit l'habilitation au mandant mais ne connaît pas le `Mandant` actif, mémorisé côté navigateur (`sessionStorage`). Le filtrage par `Mandant` actif est appliqué systématiquement par les services (`mandant_id`), et les clés étrangères composites empêchent toute référence croisée entre mandants ou entre utilisateurs.
+- **`Mandant` actif** : la RLS garantit l'habilitation au mandant mais ne connaît pas le `Mandant` actif, mémorisé côté navigateur (`sessionStorage` pour l'onglet, `localStorage` pour le dernier `Mandant` de l'appareil, §5). Le filtrage par `Mandant` actif est appliqué systématiquement par les services (`mandant_id`), et les clés étrangères composites empêchent toute référence croisée entre mandants ou entre utilisateurs.
 
 ### 4.2. Configurations requises côté Supabase (hors code versionné)
 
@@ -433,14 +433,17 @@ Pour sécuriser l'ensemble du dispositif — l'accès aux données par utilisate
 
 ## 5. Authentification Google OAuth et Cycle de Vie du Mandant
 
-1. **Sélection explicite avant OAuth (`RG-MND-02`, `F-AUTH-01`)** : sur l'écran `connexion`, l'utilisateur choisit explicitement `REAL` ou `TEST`. Aucun `Mandant` n'est présélectionné par défaut ni résolu par repli silencieux vers `REAL`.
-2. **Stockage par onglet (`sessionStorage`)** : le `Mandant` choisi est stocké dans `sessionStorage` (isolé par onglet / contexte de navigation, distinct du `localStorage` partagé) et conservé durant la redirection Google OAuth.
+1. **Sélection explicite à la première connexion (`RG-MND-02`, `F-AUTH-01`)** : sur l'écran `connexion` (première connexion sur l'appareil, après une déconnexion ou si le `Mandant` mémorisé n'est plus valide), l'utilisateur choisit explicitement `REAL` ou `TEST`. Aucun `Mandant` n'est présélectionné sur cet écran ni résolu par repli silencieux vers `REAL`.
+2. **Stockage du `Mandant` et de la session (`RG-MND-02`, `F-AUTH-03`)** :
+   - le `Mandant` actif d'un onglet est stocké dans `sessionStorage` (isolé par onglet, conservé durant la redirection Google OAuth) ;
+   - le **dernier `Mandant` utilisé** est aussi stocké dans `localStorage` (partagé par les onglets, et par l'application installée sur Android). À l'ouverture d'un onglet sans `Mandant` en `sessionStorage`, si une session existe, ce `Mandant` est repris puis vérifié (point 3). Un changement de `Mandant` dans un onglet ne modifie pas les autres onglets déjà ouverts ;
+   - la session Supabase (jeton d'accès et jeton de renouvellement) est conservée dans `localStorage` par la bibliothèque et renouvelée automatiquement ; l'application ne déconnecte jamais d'elle-même à la réouverture. Seuls la déconnexion volontaire, l'échec du renouvellement ou un compte sans habilitation ramènent à l'écran `connexion`.
 3. **Retour OAuth et vérification d'habilitation (`RG-MND-03`, `F-AUTH-02`)** :
    - `auth.service.js` initialise et suit la session Supabase (`getSession`, `onAuthStateChange`, renouvellement de jeton, gestion des erreurs `401` / `403`).
-   - `mandant.service.js` lit le `Mandant` dans `sessionStorage` et vérifie via Supabase (`habilitations` + `mandants`) que l'utilisateur connecté est habilité sur ce `Mandant` et que celui-ci est actif.
-   - Si la vérification échoue ou si `sessionStorage` est absent, l'accès aux données métier est bloqué et l'utilisateur est renvoyé vers la sélection explicite du `Mandant`.
+   - `mandant.service.js` lit le `Mandant` dans `sessionStorage` (à défaut, le dernier `Mandant` dans `localStorage`) et vérifie via Supabase (`habilitations` + `mandants`) que l'utilisateur connecté est habilité sur ce `Mandant` et que celui-ci est actif.
+   - Si la vérification échoue ou si aucun `Mandant` n'est mémorisé, l'accès aux données métier est bloqué et l'utilisateur est renvoyé vers la sélection explicite du `Mandant` ; le `Mandant` mémorisé invalide est effacé, la session Google est conservée si elle est valide.
    - Un compte authentifié sans aucune habilitation (absent de `utilisateurs_autorises`) reçoit un message explicite d'accès non autorisé et est déconnecté.
-4. **Visibilité permanente et changement de `Mandant` (`RG-MND-04`, `F-AUTH-03`)** : le `Mandant` actif est affiché en permanence sur tous les écrans authentifiés. Tout changement de `Mandant` impose la déconnexion / réinitialisation complète de la session active et du `sessionStorage` avant une nouvelle sélection et authentification.
+4. **Visibilité permanente et changement de `Mandant` (`RG-MND-04`, `F-AUTH-03`)** : le `Mandant` actif est affiché en permanence sur tous les écrans authentifiés. Un changement de `Mandant` (écran `configuration`) vérifie l'habilitation au `Mandant` cible, met à jour `sessionStorage` et `localStorage`, puis recharge entièrement l'application (rechargement de page) afin qu'aucun état du `Mandant` précédent ne subsiste ; la session Google est conservée. La **déconnexion** efface la session, `sessionStorage` et le `Mandant` mémorisé dans `localStorage`.
 5. **Résilience réseau et erreurs (`F-AUTH-04`, `F-EDIT-05`, `NFR-SUP-REL-01`)** : toute lecture / écriture requiert une connexion réseau active. En cas d'erreur réseau, d'erreur Supabase ou de perte de contexte `Mandant` :
    - aucune réussite n'est affichée ;
    - un message clair est présenté ;

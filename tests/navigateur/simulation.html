@@ -12,7 +12,10 @@
   <script type="module">
     import { clientSimule } from './client-simule.js';
     globalThis.__CLIENT_SIMULE__ = clientSimule;
-    sessionStorage.setItem('suivi-repas.mandant', JSON.stringify({ code: 'TEST' }));
+    // Première ouverture : mandant TEST ; ensuite, le dernier mandant utilisé est repris (RG-MND-02).
+    if (!localStorage.getItem('suivi-repas.dernier-mandant')) {
+      localStorage.setItem('suivi-repas.dernier-mandant', JSON.stringify({ code: 'TEST' }));
+    }
     if (!location.hash || location.hash === '#/connexion') location.hash = '#/accueil';
     await import('../../apps/mobile/app.js');
   </script>

@@ -3,7 +3,8 @@
 import { el, remplacer } from '../../dom.js';
 import { bandeauErreur } from '../../ui.js';
 import { choisirMandant, oublierMandant } from '../../../../shared/services/mandant.service.js';
-import { connexionGoogle } from '../../../../shared/services/auth.service.js';
+import { connexionGoogle, sessionCourante } from '../../../../shared/services/auth.service.js';
+import { naviguer } from '../../navigation.js';
 
 const MANDANTS = [
   { code: 'REAL', libelle: 'Usage réel' },
@@ -11,8 +12,9 @@ const MANDANTS = [
 ];
 
 export function afficher(racine, contexte) {
-  oublierMandant(); // aucun mandant présélectionné (RG-MND-02)
+  oublierMandant(); // aucun mandant présélectionné sur cet écran (RG-MND-02)
   let choix = null;
+  let sessionValide = false; // session Google conservée : le choix du mandant suffit (F-AUTH-03)
   const zoneMessage = el('div', { 'aria-live': 'polite' });
   const bouton = el('button', { class: 'bouton bouton--principal bouton--large', type: 'button', disabled: true }, 'Se connecter avec Google');
 
@@ -34,7 +36,8 @@ export function afficher(racine, contexte) {
     remplacer(zoneMessage);
     try {
       choisirMandant(choix);
-      await connexionGoogle(`${location.origin}${location.pathname}`);
+      if (sessionValide) naviguer('accueil');
+      else await connexionGoogle(`${location.origin}${location.pathname}`);
     } catch (erreur) {
       remplacer(zoneMessage, bandeauErreur(erreur.message));
       bouton.removeAttribute('aria-busy');
@@ -67,6 +70,12 @@ export function afficher(racine, contexte) {
       el('legend', { style: 'margin-bottom: 12px; font-weight: 600' }, 'Choisissez le mandant'),
       cartes),
     bouton));
+
+  sessionCourante().then((session) => {
+    if (!session) return;
+    sessionValide = true;
+    bouton.textContent = 'Continuer';
+  }).catch(() => {});
 
   return () => {
     window.removeEventListener('online', surReseau);

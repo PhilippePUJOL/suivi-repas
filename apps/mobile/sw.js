@@ -3,7 +3,7 @@
 // données utilisateur (les appels à Supabase, sur une autre origine, ne sont pas interceptés).
 // Stratégie « réseau d'abord » : la version en ligne est toujours préférée ; le cache ne sert
 // qu'à afficher l'interface si le réseau manque (la saisie exige de toute façon le réseau).
-const VERSION = 'suivi-repas-v1';
+const VERSION = 'suivi-repas-v2';
 
 self.addEventListener('install', () => self.skipWaiting());
 

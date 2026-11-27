@@ -6,7 +6,7 @@ import { sessionCourante, surChangementSession } from '../../shared/services/aut
 import { verifierMandant } from '../../shared/services/mandant.service.js';
 import { el, remplacer } from './dom.js';
 import { bandeauErreur } from './ui.js';
-import { contexte, naviguer, quitterSession, definirRafraichissement } from './navigation.js';
+import { contexte, naviguer, quitterSession, choisirUnMandant, definirRafraichissement } from './navigation.js';
 import * as ecranConnexion from './screens/connexion/connexion.screen.js';
 import * as ecranAccueil from './screens/accueil/accueil.screen.js';
 import * as ecranJournal from './screens/journal/journal.screen.js';
@@ -46,7 +46,8 @@ async function etablirContexte() {
     return true;
   } catch (erreur) {
     if (erreur.type === 'ACCES') {
-      await quitterSession(erreur.motif === 'MANDANT_ABSENT' ? null : erreur.message);
+      if (erreur.motif === 'AUCUNE_HABILITATION') await quitterSession(erreur.message);
+      else choisirUnMandant(erreur.motif === 'MANDANT_ABSENT' ? null : erreur.message);
       return false;
     }
     throw erreur;

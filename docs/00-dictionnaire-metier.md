@@ -92,7 +92,7 @@
 
 ### Mandant
 - **Définition** : Contexte d'isolation de données identifié de façon unique, classé selon sa finalité (par exemple `REAL` pour l'usage réel et `TEST` pour les essais et tests automatisés). Toutes les données fonctionnelles et référentielles appartiennent à un et un seul utilisateur et à un et un seul mandant.
-- **Périmètre / Exclusions** : Sélectionné explicitement avant l'authentification et conservé sur l'ensemble de la session active sans mélange de données entre contextes. Ne remplace ni l'authentification ni les *habilitations* de l'utilisateur. Plusieurs *utilisateurs autorisés* peuvent accéder à un même mandant, chacun avec ses propres données (table d'aliments incluse), sans aucun partage entre utilisateurs.
+- **Périmètre / Exclusions** : Choisi explicitement lors de la première connexion sur un appareil (ou après une déconnexion) ; le dernier mandant utilisé est ensuite mémorisé sur l'appareil et rouvert automatiquement, et l'utilisateur peut en changer une fois connecté. Un seul mandant est actif à la fois, sans mélange de données entre contextes. Ne remplace ni l'authentification ni les *habilitations* de l'utilisateur. Plusieurs *utilisateurs autorisés* peuvent accéder à un même mandant, chacun avec ses propres données (table d'aliments incluse), sans aucun partage entre utilisateurs.
 - **Synonymes proscrits** : *MANDT*, *Client*, *Environnement*.
 
 ### Aliment cuisinable

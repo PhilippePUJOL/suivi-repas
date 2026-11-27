@@ -8,8 +8,14 @@ let n = 0;
 const id = (p) => `${p}-${++n}`;
 
 const base = {
-  mandants: [{ id: 'm-test', code: 'TEST', libelle: 'Essais et tests', est_actif: true }],
-  habilitations: [{ id: 'h1', user_id: UTILISATEUR.id, mandant_id: 'm-test', est_active: true }],
+  mandants: [
+    { id: 'm-real', code: 'REAL', libelle: 'Usage réel', est_actif: true },
+    { id: 'm-test', code: 'TEST', libelle: 'Essais et tests', est_actif: true },
+  ],
+  habilitations: [
+    { id: 'h1', user_id: UTILISATEUR.id, mandant_id: 'm-test', est_active: true },
+    { id: 'h2', user_id: UTILISATEUR.id, mandant_id: 'm-real', est_active: true },
+  ],
   types_prise_alimentaire: [
     ['Déjeuner', '🍽️', '11:30:00', '14:30:00', 1], ['Dîner', '🌙', '19:00:00', '22:30:00', 2],
     ['Petit déjeuner', '☕', '05:00:00', '10:00:00', 3], ['Apéritif', '🥂', '18:00:00', '20:00:00', 4],

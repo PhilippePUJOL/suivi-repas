@@ -77,7 +77,8 @@ flowchart TD
     S -->|Compléter un aliment, feuille| S
     A <--> R
     A <--> G[E-06 Configuration]
-    G -->|Changer de Mandant / Se déconnecter| C
+    G -->|Se déconnecter| C
+    G -->|Changer de Mandant| A
 ```
 
 * Après enregistrement d'une prise alimentaire, l'utilisateur revient sur E-03 positionné sur la date de la prise, la prise enregistrée étant mise en évidence brièvement.
@@ -188,7 +189,7 @@ Glucides 180 g (dont sucres 35 g)          Cible 220–260 g · sous la plage de
 
 ### 5.1. E-01 — Connexion (`connexion`)
 
-**Finalité** : entrer dans un `Mandant` explicitement choisi, avec un compte Google autorisé.
+**Finalité** : entrer dans un `Mandant` explicitement choisi, avec un compte Google autorisé. L'écran n'apparaît qu'à la première connexion sur un appareil, après une déconnexion, ou si la session ou le `Mandant` mémorisé ne sont plus valides : sinon l'application s'ouvre directement sur E-02 dans le dernier `Mandant` utilisé (`RG-MND-02`).
 
 **Contenu** :
 1. Nom et icône de l'application.
@@ -199,7 +200,7 @@ Glucides 180 g (dont sucres 35 g)          Cible 220–260 g · sous la plage de
 4. Bouton **Se connecter avec Google**, désactivé tant qu'aucun `Mandant` n'est choisi.
 
 **Comportements** :
-* Au tap sur le bouton, le `Mandant` choisi est mémorisé pour l'onglet puis l'utilisateur est redirigé vers Google (`04` §5).
+* Au tap sur le bouton, le `Mandant` choisi est mémorisé (onglet et appareil) puis l'utilisateur est redirigé vers Google (`04` §5).
 * Au retour, un indicateur « Vérification de l'accès… » s'affiche pendant le contrôle d'habilitation (`RG-MND-03`).
 * Succès : arrivée sur E-02.
 
@@ -395,8 +396,8 @@ Un tap sur une puce de base courante ajoute directement la ligne avec la premiè
 #### 5.6.4. Compte et `Mandant` (`F-CFG-03`, `RG-MND-04`)
 * Profil Google connecté (nom, adresse, photo).
 * `Mandant` actif.
-* **Changer de mandant** : confirmation « Vous allez être déconnecté. Choisissez ensuite le mandant puis reconnectez-vous. » puis retour à E-01 sans sélection.
-* **Se déconnecter** : même retour à E-01.
+* **Changer de mandant** : choix du `Mandant` cible (`REAL`, `TEST`), puis confirmation « Passer au mandant TEST ? L'écran sera réinitialisé. » ; l'application rouvre E-02 dans le nouveau `Mandant`, sans nouvelle connexion Google (`RG-MND-04`). Si le compte n'a pas d'habilitation sur le `Mandant` cible, un message l'indique et le `Mandant` actif reste inchangé.
+* **Se déconnecter** : la session et le `Mandant` mémorisé sont effacés ; retour à E-01 sans sélection.
 
 ---
 
@@ -408,7 +409,8 @@ Chaque parcours indique les écrans traversés, les règles appliquées et les c
 1. E-01 : l'utilisateur choisit `REAL`, touche **Se connecter avec Google**.
 2. Google OAuth, retour, « Vérification de l'accès… ».
 3. Compte présent dans la liste : habilitations et types de prise alimentaire initiaux créés (`RG-USR-02`) ; arrivée sur E-02 vue Jour, valeurs à `0`, « Aucune prise alimentaire ce jour ».
-4. Variante : compte absent de la liste → message d'accès refusé et déconnexion (`CA-13`).
+4. Réouvertures suivantes de l'application sur cet appareil : arrivée directe sur E-02 dans `REAL`, sans E-01 ni Google (`RG-MND-02`, `F-AUTH-03`).
+5. Variante : compte absent de la liste → message d'accès refusé et déconnexion (`CA-13`).
 
 *Critères* : `CA-01`, `CA-13`.
 
@@ -474,9 +476,9 @@ Chaque parcours indique les écrans traversés, les règles appliquées et les c
 *Critères* : `F-JRN-03`.
 
 ### P-09 — Changer de `Mandant`
-1. Tap sur le badge `REAL` → E-06 section Compte → **Changer de mandant** → confirmation.
-2. Déconnexion complète → E-01, aucun `Mandant` sélectionné.
-3. Choix de `TEST` → Google OAuth → E-02 avec le bandeau `TEST` ; aucune donnée de `REAL` n'est visible.
+1. Tap sur le badge `REAL` → E-06 section Compte → **Changer de mandant** → choix de `TEST` → confirmation.
+2. Réinitialisation complète du contexte affiché, sans nouvelle connexion Google.
+3. E-02 avec le bandeau `TEST` ; aucune donnée de `REAL` n'est visible. À la réouverture suivante, l'application s'ouvre dans `TEST`, dernier `Mandant` utilisé.
 
 *Critères* : `CA-01`.
 
@@ -508,7 +510,7 @@ Chaque parcours indique les écrans traversés, les règles appliquées et les c
 | **Erreur réseau / Supabase** | Bandeau persistant avec **Réessayer** ; contenu saisi conservé ; aucune réussite affichée. | `F-AUTH-04`, `CA-10` |
 | **Hors connexion à l'ouverture** | Écran « Connexion réseau requise » avec **Réessayer** ; aucune donnée n'est affichée depuis un cache. | `01` §3.3, `04` §1.2 |
 | **Session expirée** | Renouvellement silencieux du jeton ; en cas d'échec, message « Votre session a expiré » et retour à E-01 ; une saisie en cours dans E-04 est conservée le temps de la reconnexion (5.4.5). | `F-AUTH-03`, `F-EDIT-05`, `04` §5 |
-| **Perte du `Mandant` actif** (onglet sans `Mandant` mémorisé) | Accès aux données bloqué, retour à E-01 sans sélection. | `RG-MND-02`, `04` §5 |
+| **Perte du `Mandant` actif** (aucun `Mandant` mémorisé, ou `Mandant` mémorisé sans habilitation active) | Accès aux données bloqué, retour à E-01 sans sélection, sans repli vers `REAL`. | `RG-MND-02`, `04` §5 |
 | **Total incomplet** | Indicateur d'incomplétude (4.1). | `RG-CAL-05` |
 
 **Accessibilité et confort** (`04` §2.1) : thème clair uniquement ; contrastes conformes WCAG AA ; libellés textuels pour toutes les icônes ; navigation au clavier possible ; animations supprimées si `prefers-reduced-motion` ; champs numériques avec `inputmode="decimal"` et acceptation de la virgule ; formats français pour les dates (« lun. 24 nov. ») et heures sur 24 h.
@@ -590,6 +592,7 @@ Validés par Philippe les 24 et 25/11/2026 et reportés dans les documents de r�
 | **Q15** | Cible des glucides. | Plage de 35 à 55 % de l'énergie, sans calcul de l'énergie restante après lipides et protéines (5.6.3). | — |
 | **Q16** | Cible des sucres. | Cible sur les sucres totaux (« dont sucres »), avec une valeur haute de départ à 50 g, les sucres ajoutés n'étant pas distingués (5.6.3). | — |
 | **Q17** | Cibles de départ. | Créées automatiquement à la première connexion, modifiables, avec un bouton « Rétablir les cibles de départ » (5.6.3). | `RG-USR-02`, `RG-CIB-07` ; `04` §3.1, §3.7 |
+| **Q18** | Reconnexion à chaque ouverture. | Session conservée sur l'appareil (Google sollicité seulement à la première connexion ou après déconnexion) ; dernier `Mandant` mémorisé et rouvert automatiquement ; changement de `Mandant` depuis E-06 sans nouvelle authentification (validé le 27/11/2026). | `00` *Mandant* ; `01` §3.1 ; `RG-MND-02`, `RG-MND-04`, `F-AUTH-01`, `F-AUTH-03`, `F-CFG-03`, `CA-01` ; `04` §4.1, §5 |
 | **R1** | Reprise des maquettes de l'ancienne version. | Repris : ligne de contexte compacte, portion et état modifiables sur la ligne, total de la journée face à la cible dans le pied de la saisie, écarts à la cible dans la vue 7 jours (5.2.3, 5.4.1). Écartés : vocabulaire (*repas*, *ingrédient*), état sur une recette, gestion des prises sur l'accueil, synchronisation Garmin, boutons d'ajout séparés par nature. | — |
 
 ### 10.2. Points ouverts
